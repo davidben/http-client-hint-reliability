@@ -290,7 +290,7 @@ but does not change these considerations. The procedure described in
 otherwise would not have.
 
 The ACCEPT_CH frame does introduce a new way for HTTP/2 connections to make
-assertions about origins they are not authoritative for, but the procedure in 
+assertions about origins they are not authoritative for, but the procedure in
 {{processing-accept-ch-frames}} defers processing until after the user agent has decided to use
 the connection for a particular request (Section 9.1.1 of {{RFC7540}}). The user
 agent will thus only information in an ACCEPT_CH frame if it considers the
