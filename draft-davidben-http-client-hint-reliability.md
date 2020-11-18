@@ -27,6 +27,8 @@ normative:
   RFC8446:
   I-D.ietf-httpbis-client-hints:
   I-D.ietf-httpbis-header-structure:
+  I-D.ietf-quic-http:
+  I-D.ietf-quic-transport:
   I-D.vvv-httpbis-alps:
   I-D.vvv-tls-alps:
 
@@ -44,8 +46,8 @@ informative:
 --- abstract
 
 This document defines the Critical-CH HTTP response header, and the ACCEPT_CH
-HTTP/2 frame to allow HTTP servers to reliably specify their Client Hint
-preferences, with minimal performance overhead.
+HTTP/2 and HTTP/3 frames to allow HTTP servers to reliably specify their Client
+Hint preferences, with minimal performance overhead.
 
 
 --- middle
@@ -64,9 +66,12 @@ account. More generally, the server's configuration may have changed since the
 most recent HTTP request to the server. This document defines a pair of
 mechanisms to resolve this:
 
-1. an HTTP response header, Critical-CH, for the server to instruct the user agent to retry the request
+1. an HTTP response header, Critical-CH, for the server to instruct the user
+   agent to retry the request
 
-2. an alternate delivery mechanism for Accept-CH in HTTP/2 {{RFC7540}}, which can avoid the performance hit of a retry in most cases
+2. an alternate delivery mechanism for Accept-CH in HTTP/2 {{RFC7540}} and
+   HTTP/3 {{I-D.ietf-quic-http}}, which can avoid the performance hit of a
+   retry in most cases
 
 
 # Conventions and Definitions
@@ -77,6 +82,9 @@ document are to be interpreted as described in BCP 14 {{RFC2119}} {{!RFC8174}}
 when, and only when, they appear in all capitals, as shown here.
 
 This document uses the Augmented Backus-Naur Form (ABNF) notation of {{RFC5234}}.
+
+This document uses the variable-length integer encoding and frame diagram format
+from {{I-D.ietf-quic-transport}}.
 
 
 # The Critical-CH Response Header Field {#critical-ch}
@@ -172,17 +180,27 @@ retries the request, and receives a more specific response.
 ~~~
 
 
-# The ACCEPT_CH HTTP/2 Frame
+# The ACCEPT_CH Frame
 
 While Critical-CH header provides reliability, it requires a retry on some
-requests. This document additionally introduces the ACCEPT_CH HTTP/2 frame as an
-optimization so the server's Client Hint preferences are usually available
-before the client's first request.
+requests. This document additionally introduces the ACCEPT_CH HTTP/2 and HTTP/3
+frames as an optimization so the server's Client Hint preferences are usually
+available before the client's first request.
+
+HTTP/2 and HTTP/3 servers which request Client Hints SHOULD send an ACCEPT_CH
+frame as early as possible. Connections using TLS {{RFC8446}} which negotiate the
+Application Layer Protocol Settings (ALPS) {{I-D.vvv-tls-alps}} extension
+SHOULD include the ACCEPT_CH frame in the ALPS value as described in
+{{I-D.vvv-httpbis-alps}}. This ensures the information is available to the
+user agent when it makes the first request.
 
 \[\[TODO: Alternatively, is it time to revive
 draft-bishop-httpbis-extended-settings?\]\]
 
-The ACCEPT_CH frame type is TBD (decimal TBD) and contains one or more entries, each consisting of a pair of length-delimited strings:
+
+## HTTP/2 ACCEPT_CH Frame
+
+The HTTP/2 ACCEPT_CH frame type is TBD (decimal TBD) and contains zero or more entries, each consisting of a pair of length-delimited strings:
 
 ~~~
 +-------------------------------+
@@ -190,9 +208,9 @@ The ACCEPT_CH frame type is TBD (decimal TBD) and contains one or more entries, 
 +-------------------------------+-------------------------------+
 |         Origin                                              ...
 +-------------------------------+-------------------------------+
-|         Accept-CH-Len (16)    |
+|         Value-Len (16)        |
 +-------------------------------+-------------------------------+
-|         Accept-CH-Value                                     ...
+|         Value                                               ...
 +---------------------------------------------------------------+
 ~~~
 
@@ -204,20 +222,13 @@ Origin-Len:
 Origin:
 : A sequence of characters containing the ASCII serialization of an origin (Section 6.2 of {{RFC6454}}) that the sender is providing an Accept-CH value for.
 
-Accept-CH-Len:
-: An unsigned, 16-bit integer indicating the length, in octets, of the Accept-CH-Value field.
+Value-Len:
+: An unsigned, 16-bit integer indicating the length, in octets, of the Value field.
 
-Accept-CH-Value:
+Value:
 : A sequence of characters containing the Accept-CH value for the corresponding origin. This value MUST satisfy the Accept-CH ABNF defined in Section 3.1 of {{I-D.ietf-httpbis-client-hints}}.
 
-HTTP/2 Servers which request Client Hints SHOULD send an ACCEPT_CH frame as
-early as possible. Connections using TLS {{RFC8446}} which negotiate the
-Application Layer Protocol Settings (ALPS) {{I-D.vvv-tls-alps}} extension
-SHOULD include the ACCEPT_CH frame in the ALPS value as described in
-{{I-D.vvv-httpbis-alps}}. This ensures the information is available to the
-user agent when it makes the first request.
-
-User agents MUST NOT send ACCEPT_CH frames. Servers which receive an ACCEPT_CH
+Clients MUST NOT send ACCEPT_CH frames. Servers which receive an ACCEPT_CH
 frame MUST respond with a connection error (Section 5.4.1 of {{RFC7540}}) of type
 PROTOCOL_ERROR.
 
@@ -227,18 +238,60 @@ field is unused and MUST be zero. If a user agent receives an ACCEPT_CH frame wh
 stream identifier or flags field is non-zero, it MUST respond with a connection
 error of type PROTOCOL_ERROR.
 
+## HTTP/3 ACCEPT_CH Frame
+
+The HTTP/3 ACCEPT_CH frame type is TBD (decimal TBD) and contains zero or more
+entries, each containing an origin and a corresponding Accept-CH value.
+
+~~~
+HTTP/3 ACCEPT_CH Entry {
+  Origin Length (i),
+  Origin (..)
+  Value Length (i),
+  Value (..),
+}
+
+HTTP/3 ACCEPT_CH Frame {
+  Type (i) = TBD,
+  Length (i),
+  HTTP/3 ACCEPT_CH Entry (..) ...,
+}
+~~~
+
+The fields of each HTTP/3 ACCEPT_CH Entry are defined as follows:
+
+Origin Length:
+: A variable-length integer containing the length, in bytes, of the Origin field.
+
+Origin:
+: A sequence of characters containing the ASCII serialization of an origin (Section 6.2 of {{RFC6454}}) that the sender is providing an Accept-CH value for.
+
+Value Length:
+: A variable-length integer containing the length, in bytes, of the Value field.
+
+Value:
+: A sequence of characters containing the Accept-CH value for the corresponding origin. This value MUST satisfy the Accept-CH ABNF defined in Section 3.1 of {{I-D.ietf-httpbis-client-hints}}.
+
+Clients MUST NOT send ACCEPT_CH frames. Servers which receive an ACCEPT_CH
+frame MUST respond with a connection error (Section 8 of {{I-D.ietf-quic-http}})
+of type H3_FRAME_UNEXPECTED.
+
+ACCEPT_CH frames may only be sent on the control stream. Clients which receive
+an ACCEPT_CH frame on any other stream MUST respond with a connection error of
+type H3_FRAME_UNEXPECTED.
 
 ## Processing ACCEPT_CH Frames {#processing-accept-ch-frames}
 
 The user agent remembers the most recently received ACCEPT_CH frame for each
-connection. When it receives a new ACCEPT_CH frame, either in application data
-or ALPS, it overwrites this value. As this is an optimization, the user agent MAY
-bound the size and ignore or forget entries to reduce resource usage.
+HTTP/2 or HTTP/3 connection. When it receives a new ACCEPT_CH frame, either in
+application data or ALPS, it overwrites this value. As this is an optimization,
+the user agent MAY bound the size and ignore or forget entries to reduce
+resource usage.
 
 When the user agent makes an HTTP request to a particular origin over an HTTP/2
-connection, it looks up the origin in the remembered ACCEPT_CH, if any. If it
-finds a match, it determines additional Client Hints to send, incorporating its
-local policy and user preferences. See Section 2.1 of
+or HTTP/3 connection, it looks up the origin in the remembered ACCEPT_CH, if
+any. If it finds a match, it determines additional Client Hints to send,
+incorporating its local policy and user preferences. See Section 2.1 of
 {{I-D.ietf-httpbis-client-hints}}.
 
 If there are additional Client Hints, the user agent restarts the request with
@@ -270,13 +323,22 @@ and other unmatched entries are ignored.
 The ACCEPT_CH frame avoids a round-trip, so relying on it over Critical-CH would
 be preferable. However, this is not always possible:
 
-* The server may be running older software without support for ACCEPT_CH or ALPS.
+* The server may be running older software without support for ACCEPT_CH or
+  ALPS.
 
-* The server's Accept-CH preferences may change while existing connections are open. Those connections will have outdated ACCEPT_CH frames. While the server could send a new one, the frame may not arrive in time for the next request. Moreover, if the HTTP serving frontend is an intermediary like a CDN, it may not be proactively notified of origin server changes.
+* The server's Accept-CH preferences may change while existing connections are
+  open. Those connections will have outdated ACCEPT_CH frames. While the server
+  could send a new frame, it may not arrive in time for the next request.
+  Moreover, if the HTTP serving frontend is an intermediary like a CDN, it may
+  not be proactively notified of origin server changes.
 
-* HTTP/2 allows connection reuse across multiple origins (Section 9.1.1 of {{RFC7540}}). Some origins may not be listed in the ACCEPT_CH frame, particularly if the server used a wildcard X.509 certificate.
+* HTTP/2 and HTTP/3 allow connection reuse across multiple origins (Section
+  9.1.1 of {{RFC7540}} nad Section 3.4 of {{I-D.ietf-quic-http}}). Some origins
+  may not be listed in the ACCEPT_CH frame, particularly if the server used a
+ wildcard X.509 certificate.
 
-Thus this document defines both mechanisms. Critical-CH provides reliable Client
+Thus this document defines both mechanisms. Critical-CH provides reliable
+Client
 Hint delivery, while the ACCEPT_CH frame avoids the retry in most cases.
 
 
@@ -289,18 +351,19 @@ but does not change these considerations. The procedure described in
 {{critical-ch}} does not result in the user agent sending request headers it
 otherwise would not have.
 
-The ACCEPT_CH frame does introduce a new way for HTTP/2 connections to make
-assertions about origins they are not authoritative for, but the procedure in
-{{processing-accept-ch-frames}} defers processing until after the user agent has decided to use
-the connection for a particular request (Section 9.1.1 of {{RFC7540}}). The user
-agent will thus only information in an ACCEPT_CH frame if it considers the
-connection authoritative for the origin.
+The ACCEPT_CH frame does introduce a new way for HTTP/2 or HTTP/3 connections to
+make assertions about origins they are not authoritative for, but the procedure
+in  {{processing-accept-ch-frames}} defers processing until after the user agent
+has decided to use the connection for a particular request (Section 9.1.1 of
+{{RFC7540}} and Section 3.4 of {{I-D.ietf-quic-http}}). The user agent will thus
+only use information from an ACCEPT_CH frame if it considers the connection
+authoritative for the origin.
 
 
 # IANA Considerations
 
-This specification adds an entry to the "HTTP/2 Frame Type" registry with the
-following parameters:
+This specification adds an entry to the "HTTP/2 Frame Type" registry {{RFC7540}}
+with the following parameters:
 
 * Frame Type: ACCEPT_CH
 
@@ -310,9 +373,20 @@ following parameters:
 
 * Reference: \[\[this document\]\]
 
-\[\[TODO: As of writing, the HTTP/2 Frame Type registry does not include an
-Allowed in ALPS column. {{I-D.vvv-httpbis-alps}}, as of writing, will add it.
-This document should be updated as that design evolves.\]\]
+This specification adds an entry to the "HTTP/3 Frame Type" registry
+{{I-D.ietf-quic-http}} with the following parameters:
+
+* Frame Type: ACCEPT_CH
+
+* Code: TBD
+
+* Allowed in ALPS: Yes
+
+* Reference: \[\[this document\]\]
+
+\[\[TODO: As of writing, the Frame Type registries do not include
+Allowed in ALPS columns, but {{I-D.vvv-httpbis-alps}} adds them. This document
+should be updated as that design evolves.\]\]
 
 
 --- back
