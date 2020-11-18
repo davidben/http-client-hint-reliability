@@ -22,6 +22,7 @@ normative:
   RFC5234:
   RFC6454:
   RFC7231:
+  RFC7234:
   RFC7540:
   RFC8446:
   I-D.ietf-httpbis-client-hints:
@@ -53,17 +54,17 @@ preferences, with minimal performance overhead.
 
 {{I-D.ietf-httpbis-client-hints}} defines a response header,
 Accept-CH, for servers to advertise a set of request headers used for proactive
-content negotiation. This allows clients to send request headers only when used,
-improving their performance overhead as well as reducing passive fingerprinting
-surface.
+content negotiation. This allows user agents to send request headers only when
+used, improving their performance overhead as well as reducing passive
+fingerprinting surface.
 
-However, on the first HTTP request to a server, the client will not have
+However, on the first HTTP request to a server, the user agent will not have
 received the Accept-CH header and may not take the server preferences into
 account. More generally, the server's configuration may have changed since the
 most recent HTTP request to the server. This document defines a pair of
 mechanisms to resolve this:
 
-1. an HTTP response header, Critical-CH, for the server to instruct the client to retry the request
+1. an HTTP response header, Critical-CH, for the server to instruct the user agent to retry the request
 
 2. an alternate delivery mechanism for Accept-CH in HTTP/2 {{RFC7540}}, which can avoid the performance hit of a retry in most cases
 
@@ -80,14 +81,14 @@ This document uses the Augmented Backus-Naur Form (ABNF) notation of {{RFC5234}}
 
 # The Critical-CH Response Header Field {#critical-ch}
 
-When a client requests a resource based on a missing or outdated Accept-CH
-value, it may not send a desired request header field. Neither client nor server
+When a user agent requests a resource based on a missing or outdated Accept-CH
+value, it may not send a desired request header field. Neither user agent nor server
 has enough information to reliably and efficiently recover from this situation.
-The server can observe that the header is missing, but the client may not have
+The server can observe that the header is missing, but the user agent may not have
 supported the header, or may have chosen not to send it. Triggering a new
 request in these cases would risk an infinite loop or an unnecessary round-trip.
 
-Conversely, the client can observe that a request header appears in the
+Conversely, the user agent can observe that a request header appears in the
 Accept-CH (Section 3.1 of {{I-D.ietf-httpbis-client-hints}}) and Vary (Section
 7.1.4 of {{RFC7231}}) response header fields. However, retrying based on this
 information would waste resources if the resource only used the Client Hint as
@@ -96,7 +97,7 @@ an optional optimization.
 This document introduces critical Client Hints. These are the Client Hints which
 meaningfully change the resulting resource. For example, a server may use the
 Device-Memory Client Hint {{DEVICE-MEMORY}} to select simple and complex variants
-of a resource to different clients. Such a resource should be fetched
+of a resource to different user agents. Such a resource should be fetched
 consistently across page loads to avoid jarring user-visible switches.
 
 The server specifies critical Client Hints with the Critical-CH response header
@@ -214,33 +215,40 @@ early as possible. Connections using TLS {{RFC8446}} which negotiate the
 Application Layer Protocol Settings (ALPS) {{I-D.vvv-tls-alps}} extension
 SHOULD include the ACCEPT_CH frame in the ALPS value as described in
 {{I-D.vvv-httpbis-alps}}. This ensures the information is available to the
-client when it makes the first request.
+user agent when it makes the first request.
 
-Clients MUST NOT send ACCEPT_CH frames. Servers which receive an ACCEPT_CH frame
-MUST respond with a connection error (Section 5.4.1 of {{RFC7540}}) of type
+User agents MUST NOT send ACCEPT_CH frames. Servers which receive an ACCEPT_CH
+frame MUST respond with a connection error (Section 5.4.1 of {{RFC7540}}) of type
 PROTOCOL_ERROR.
 
 ACCEPT_CH frames always apply to a single connection, never a single stream. The
 identifier in the ACCEPT_CH frame MUST be zero. The flags field of an ACCEPT_CH
-field is unused and MUST be zero. If a client receives an ACCEPT_CH frame whose
+field is unused and MUST be zero. If a user agent receives an ACCEPT_CH frame whose
 stream identifier or flags field is non-zero, it MUST respond with a connection
 error of type PROTOCOL_ERROR.
 
 
-## Client Behavior {#client-behavior}
+## Processing ACCEPT_CH Frames {#processing-accept-ch-frames}
 
-The client remembers the most recently received ACCEPT_CH frame for each
+The user agent remembers the most recently received ACCEPT_CH frame for each
 connection. When it receives a new ACCEPT_CH frame, either in application data
-or ALPS, it overwrites this value. As this is an optimization, the client MAY
+or ALPS, it overwrites this value. As this is an optimization, the user agent MAY
 bound the size and ignore or forget entries to reduce resource usage.
 
-When the client makes an HTTP request to a particular origin over an HTTP/2
+When the user agent makes an HTTP request to a particular origin over an HTTP/2
 connection, it looks up the origin in the remembered ACCEPT_CH, if any. If it
-finds a match, it treats the union of that value and any saved Accept-CH
-response header as the server's Client Hint preferences. It then proceeds as in
-Section 2.1 of {{I-D.ietf-httpbis-client-hints}}.
+finds a match, it determines additional Client Hints to send, incorporating its
+local policy and user preferences. See Section 2.1 of
+{{I-D.ietf-httpbis-client-hints}}.
 
-Clients MUST NOT process Client Hint preferences in ACCEPT_CH frames
+If there are additional Client Hints, the user agent restarts the request with
+updated headers. The connection has already been established, so this restart
+does not incur any additional network latency. Note it may result in a different
+secondary HTTP cache key (see Section 4.1 of {{RFC7234}}) and select a different
+cached response. If the new cached response does not need revalidation, it may
+not use the connection at all.
+
+User agents MUST NOT process Client Hint preferences in ACCEPT_CH frames
 corresponding to origins for which the connection is not authoritative. Note the
 procedure above implicitly satisfies this by deferring processing to after the
 connection has been chosen for a corresponding request. Unauthoritative origins
@@ -250,7 +258,7 @@ and other unmatched entries are ignored.
 
 * Do new ACCEPT_CH frames override the whole set or implement some kind of update? Overriding the whole set seems simplest and most consistent with an EXTENDED_SETTINGS variant.
 
-* Should the client reject the ACCEPT_CH frame if there are unexpected origins in there? Deferring avoids needing to worry about this, and ignoring the unused ones may interact better with secondary certs.
+* Should the user agent reject the ACCEPT_CH frame if there are unexpected origins in there? Deferring avoids needing to worry about this, and ignoring the unused ones may interact better with secondary certs.
 
 * Should ACCEPT_CH frames be deferred or just written to the cache when received? Deferred simplifies reasoning about bad origins, predictive connections, etc., but means interactions between ACCEPT_CH and Accept-CH are more complex (see below).
 
@@ -264,7 +272,7 @@ be preferable. However, this is not always possible:
 
 * The server may be running older software without support for ACCEPT_CH or ALPS.
 
-* The server's Accept-CH preferences may change while clients have existing connections open. In this case, the connection-level settings may be out of date. While the server could send a new ACCEPT_CH frame, the frame may not arrive in time for the client's next request. Moreover, if the HTTP serving frontend is an intermediary like a CDN, it may not be proactively notified of origin server changes.
+* The server's Accept-CH preferences may change while existing connections are open. Those connections will have outdated ACCEPT_CH frames. While the server could send a new one, the frame may not arrive in time for the next request. Moreover, if the HTTP serving frontend is an intermediary like a CDN, it may not be proactively notified of origin server changes.
 
 * HTTP/2 allows connection reuse across multiple origins (Section 9.1.1 of {{RFC7540}}). Some origins may not be listed in the ACCEPT_CH frame, particularly if the server used a wildcard X.509 certificate.
 
@@ -283,8 +291,10 @@ otherwise would not have.
 
 The ACCEPT_CH frame does introduce a new way for HTTP/2 connections to make
 assertions about origins they are not authoritative for, but the procedure in 
-{{client-behavior}} defers processing until after the client has decided to use
-the connection for a particular request (Section 9.1.1 of {{RFC7540}}).
+{{processing-accept-ch-frames}} defers processing until after the user agent has decided to use
+the connection for a particular request (Section 9.1.1 of {{RFC7540}}). The user
+agent will thus only information in an ACCEPT_CH frame if it considers the
+connection authoritative for the origin.
 
 
 # IANA Considerations
@@ -311,5 +321,5 @@ This document should be updated as that design evolves.\]\]
 {:numbered="false"}
 
 This document has benefited from contributions and suggestions from
-Ilya Grigorik, Nick Harper, Aaron Tagliaboschi, Victor Vasiliev, Yoav Weiss, and
-others.
+Ilya Grigorik, Nick Harper, Matt Menke, Aaron Tagliaboschi, Victor Vasiliev,
+Yoav Weiss, and others.
