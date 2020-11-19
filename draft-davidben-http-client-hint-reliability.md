@@ -333,9 +333,9 @@ be preferable. However, this is not always possible:
   not be proactively notified of origin server changes.
 
 * HTTP/2 and HTTP/3 allow connection reuse across multiple origins (Section
-  9.1.1 of {{RFC7540}} nad Section 3.4 of {{I-D.ietf-quic-http}}). Some origins
+  9.1.1 of {{RFC7540}} and Section 3.4 of {{I-D.ietf-quic-http}}). Some origins
   may not be listed in the ACCEPT_CH frame, particularly if the server used a
- wildcard X.509 certificate.
+  wildcard X.509 certificate.
 
 Thus this document defines both mechanisms. Critical-CH provides reliable
 Client
