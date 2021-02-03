@@ -233,10 +233,10 @@ frame MUST respond with a connection error (Section 5.4.1 of {{RFC7540}}) of typ
 PROTOCOL_ERROR.
 
 ACCEPT_CH frames always apply to a single connection, never a single stream. The
-identifier in the ACCEPT_CH frame MUST be zero. The flags field of an ACCEPT_CH
-field is unused and MUST be zero. If a user agent receives an ACCEPT_CH frame whose
-stream identifier or flags field is non-zero, it MUST respond with a connection
-error of type PROTOCOL_ERROR.
+stream identifier in the ACCEPT_CH frame MUST be zero. The flags field of an
+ACCEPT_CH field is unused and MUST be zero. If a user agent receives an
+ACCEPT_CH frame whose stream identifier or flags field is non-zero, it MUST
+respond with a connection error of type PROTOCOL_ERROR.
 
 ## HTTP/3 ACCEPT_CH Frame
 
