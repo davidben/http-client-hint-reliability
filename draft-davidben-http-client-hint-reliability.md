@@ -25,8 +25,24 @@ normative:
   RFC7234:
   RFC7540:
   RFC8446:
-  I-D.ietf-httpbis-client-hints:
-  I-D.ietf-httpbis-header-structure:
+
+  RFC8941:
+    author:
+    - {ins: M. Nottingham, name: M. Nottingham}
+    - {ins: P-H. Kamp, name: P-H. Kamp}
+    date: February 2021
+    seriesinfo: {DOI: 10.17487/RFC8941, RFC: '8941'}
+    target: https://www.rfc-editor.org/info/rfc8941
+    title: Structured Field Values for HTTP
+  RFC8942:
+    author:
+    - {ins: I. Grigorik, name: I. Grigorik}
+    - {ins: Y. Weiss, name: Y. Weiss}
+    date: February 2021
+    seriesinfo: {DOI: 10.17487/RFC8942, RFC: '8942'}
+    target: https://www.rfc-editor.org/info/rfc8942
+    title: HTTP Client Hints
+
   I-D.ietf-quic-http:
   I-D.ietf-quic-transport:
   I-D.vvv-httpbis-alps:
@@ -45,6 +61,11 @@ informative:
 
 --- abstract
 
+<!-- TODO(davidben): The references to RFC8941 and RFC8942 above are expanded
+out by hand because the tooling fetches from the tools.ietf.org copy of the
+bibxml. That site is currently broken, so I've manually filled them in from the
+rfc-editor.org copy. -->
+
 This document defines the Critical-CH HTTP response header, and the ACCEPT_CH
 HTTP/2 and HTTP/3 frames to allow HTTP servers to reliably specify their Client
 Hint preferences, with minimal performance overhead.
@@ -54,11 +75,10 @@ Hint preferences, with minimal performance overhead.
 
 # Introduction
 
-{{I-D.ietf-httpbis-client-hints}} defines a response header,
-Accept-CH, for servers to advertise a set of request headers used for proactive
-content negotiation. This allows user agents to send request headers only when
-used, improving their performance overhead as well as reducing passive
-fingerprinting surface.
+{{RFC8942}} defines a response header, Accept-CH, for servers to advertise a
+set of request headers used for proactive content negotiation. This allows user
+agents to send request headers only when used, improving their performance
+overhead as well as reducing passive fingerprinting surface.
 
 However, on the first HTTP request to a server, the user agent will not have
 received the Accept-CH header and may not take the server preferences into
@@ -97,10 +117,10 @@ supported the header, or may have chosen not to send it. Triggering a new
 request in these cases would risk an infinite loop or an unnecessary round-trip.
 
 Conversely, the user agent can observe that a request header appears in the
-Accept-CH (Section 3.1 of {{I-D.ietf-httpbis-client-hints}}) and Vary (Section
-7.1.4 of {{RFC7231}}) response header fields. However, retrying based on this
-information would waste resources if the resource only used the Client Hint as
-an optional optimization.
+Accept-CH (Section 3.1 of {{RFC8942}}) and Vary (Section 7.1.4 of {{RFC7231}})
+response header fields. However, retrying based on this information would waste
+resources if the resource only used the Client Hint as an optional
+optimization.
 
 This document introduces critical Client Hints. These are the Client Hints which
 meaningfully change the resulting resource. For example, a server may use the
@@ -109,10 +129,9 @@ of a resource to different user agents. Such a resource should be fetched
 consistently across page loads to avoid jarring user-visible switches.
 
 The server specifies critical Client Hints with the Critical-CH response header
-field. It is a Structured Header {{I-D.ietf-httpbis-header-structure}} whose
-value MUST be an sf-list (Section 3.1 of {{I-D.ietf-httpbis-header-structure}})
-whose members are tokens (Section 3.3.4 of
-{{I-D.ietf-httpbis-header-structure}}). Its ABNF is:
+field. It is a Structured Header {{RFC8941}} whose value MUST be an sf-list
+(Section 3.1 of {{RFC8941}}) whose members are tokens (Section 3.3.4 of
+{{RFC8941}}). Its ABNF is:
 
 ~~~
   Critical-CH = sf-list
@@ -127,15 +146,15 @@ For example:
 Each token listed in the Critical-CH header SHOULD additionally be present in
 the Accept-CH and Vary response headers.
 
-When a user agent receives an HTTP response containing a Critical-CH header,
-it first processes the Accept-CH header as described in Section 3.1 of
-{{I-D.ietf-httpbis-client-hints}}. It then performs the following steps:
+When a user agent receives an HTTP response containing a Critical-CH header, it
+first processes the Accept-CH header as described in Section 3.1 of
+{{RFC8942}}. It then performs the following steps:
 
 1. If the request did not use a safe method (Section 4.2.1 of {{RFC7231}}), ignore the Critical-CH header and continue processing the response as usual.
 
 2. If the response was already the result of a retry, ignore the Critical-CH header and continue processing the response as usual.
 
-3. Determine the Client Hints that would have been sent given the updated Accept-CH value, incorporating the user agent's local policy and user preferences. See also Section 2.1 of {{I-D.ietf-httpbis-client-hints}}.
+3. Determine the Client Hints that would have been sent given the updated Accept-CH value, incorporating the user agent's local policy and user preferences. See also Section 2.1 of {{RFC8942}}.
 
 4. Compare this result to the Client Hints which were sent. If any Client Hint listed in the Critical-CH header was not previously sent and would now have been sent, retry the request with the new preferences. Otherwise, continue processing the response as usual.
 
@@ -226,7 +245,7 @@ Value-Len:
 : An unsigned, 16-bit integer indicating the length, in octets, of the Value field.
 
 Value:
-: A sequence of characters containing the Accept-CH value for the corresponding origin. This value MUST satisfy the Accept-CH ABNF defined in Section 3.1 of {{I-D.ietf-httpbis-client-hints}}.
+: A sequence of characters containing the Accept-CH value for the corresponding origin. This value MUST satisfy the Accept-CH ABNF defined in Section 3.1 of {{RFC8942}}.
 
 Clients MUST NOT send ACCEPT_CH frames. Servers which receive an ACCEPT_CH
 frame MUST respond with a connection error (Section 5.4.1 of {{RFC7540}}) of type
@@ -270,7 +289,7 @@ Value Length:
 : A variable-length integer containing the length, in bytes, of the Value field.
 
 Value:
-: A sequence of characters containing the Accept-CH value for the corresponding origin. This value MUST satisfy the Accept-CH ABNF defined in Section 3.1 of {{I-D.ietf-httpbis-client-hints}}.
+: A sequence of characters containing the Accept-CH value for the corresponding origin. This value MUST satisfy the Accept-CH ABNF defined in Section 3.1 of {{RFC8942}}.
 
 Clients MUST NOT send ACCEPT_CH frames. Servers which receive an ACCEPT_CH
 frame MUST respond with a connection error (Section 8 of {{I-D.ietf-quic-http}})
@@ -292,7 +311,7 @@ When the user agent makes an HTTP request to a particular origin over an HTTP/2
 or HTTP/3 connection, it looks up the origin in the remembered ACCEPT_CH, if
 any. If it finds a match, it determines additional Client Hints to send,
 incorporating its local policy and user preferences. See Section 2.1 of
-{{I-D.ietf-httpbis-client-hints}}.
+{{RFC8942}}.
 
 If there are additional Client Hints, the user agent restarts the request with
 updated headers. The connection has already been established, so this restart
@@ -345,11 +364,10 @@ Hint delivery, while the ACCEPT_CH frame avoids the retry in most cases.
 # Security Considerations
 
 Request header fields may expose sensitive information about the user's
-environment. Section 4.1 of {{I-D.ietf-httpbis-client-hints}} discusses some of
-these considerations. The document augments the capabilities of Client Hints,
-but does not change these considerations. The procedure described in
-{{critical-ch}} does not result in the user agent sending request headers it
-otherwise would not have.
+environment. Section 4.1 of {{RFC8942}} discusses some of these considerations.
+The document augments the capabilities of Client Hints, but does not change
+these considerations. The procedure described in {{critical-ch}} does not
+result in the user agent sending request headers it otherwise would not have.
 
 The ACCEPT_CH frame does introduce a new way for HTTP/2 or HTTP/3 connections to
 make assertions about origins they are not authoritative for, but the procedure
