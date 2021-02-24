@@ -25,23 +25,8 @@ normative:
   RFC7234:
   RFC7540:
   RFC8446:
-
   RFC8941:
-    author:
-    - {ins: M. Nottingham, name: M. Nottingham}
-    - {ins: P-H. Kamp, name: P-H. Kamp}
-    date: February 2021
-    seriesinfo: {DOI: 10.17487/RFC8941, RFC: '8941'}
-    target: https://www.rfc-editor.org/info/rfc8941
-    title: Structured Field Values for HTTP
   RFC8942:
-    author:
-    - {ins: I. Grigorik, name: I. Grigorik}
-    - {ins: Y. Weiss, name: Y. Weiss}
-    date: February 2021
-    seriesinfo: {DOI: 10.17487/RFC8942, RFC: '8942'}
-    target: https://www.rfc-editor.org/info/rfc8942
-    title: HTTP Client Hints
 
   I-D.ietf-quic-http:
   I-D.ietf-quic-transport:
@@ -60,11 +45,6 @@ informative:
 
 
 --- abstract
-
-<!-- TODO(davidben): The references to RFC8941 and RFC8942 above are expanded
-out by hand because the tooling fetches from the tools.ietf.org copy of the
-bibxml. That site is currently broken, so I've manually filled them in from the
-rfc-editor.org copy. -->
 
 This document defines the Critical-CH HTTP response header, and the ACCEPT_CH
 HTTP/2 and HTTP/3 frames to allow HTTP servers to reliably specify their Client
