@@ -27,9 +27,9 @@ normative:
   RFC8446:
   RFC8941:
   RFC8942:
+  RFC9000:
 
   I-D.ietf-quic-http:
-  I-D.ietf-quic-transport:
   I-D.vvv-httpbis-alps:
   I-D.vvv-tls-alps:
 
@@ -84,7 +84,7 @@ when, and only when, they appear in all capitals, as shown here.
 This document uses the Augmented Backus-Naur Form (ABNF) notation of {{RFC5234}}.
 
 This document uses the variable-length integer encoding and frame diagram format
-from {{I-D.ietf-quic-transport}}.
+from {{RFC9000}}.
 
 
 # The Critical-CH Response Header Field {#critical-ch}
