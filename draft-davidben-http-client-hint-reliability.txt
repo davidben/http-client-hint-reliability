@@ -4,9 +4,9 @@
 
 HTTP                                                         D. Benjamin
 Internet-Draft                                                Google LLC
-Updates: ietf-httpbis-client-hints (if approved)             1 June 2021
+Updates: ietf-httpbis-client-hints (if approved)             5 June 2021
 Intended status: Experimental                                           
-Expires: 3 December 2021
+Expires: 7 December 2021
 
 
                         Client Hint Reliability
@@ -41,7 +41,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 3 December 2021.
+   This Internet-Draft will expire on 7 December 2021.
 
 Copyright Notice
 
