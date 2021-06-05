@@ -97,7 +97,7 @@ supported the header, or may have chosen not to send it. Triggering a new
 request in these cases would risk an infinite loop or an unnecessary round-trip.
 
 Conversely, the user agent can observe that a request header appears in the
-Accept-CH (Section 3.1 of {{RFC8942}}) and Vary (Section 7.1.4 of {{RFC7231}})
+Accept-CH ({{Section 3.1 of RFC8942}}) and Vary ({{Section 7.1.4 of RFC7231}})
 response header fields. However, retrying based on this information would waste
 resources if the resource only used the Client Hint as an optional
 optimization.
@@ -110,8 +110,8 @@ consistently across page loads to avoid jarring user-visible switches.
 
 The server specifies critical Client Hints with the Critical-CH response header
 field. It is a Structured Header {{RFC8941}} whose value MUST be an sf-list
-(Section 3.1 of {{RFC8941}}) whose members are tokens (Section 3.3.4 of
-{{RFC8941}}). Its ABNF is:
+({{Section 3.1 of RFC8941}}) whose members are tokens ({{Section 3.3.4 of
+RFC8941}}). Its ABNF is:
 
 ~~~
   Critical-CH = sf-list
@@ -127,14 +127,14 @@ Each token listed in the Critical-CH header SHOULD additionally be present in
 the Accept-CH and Vary response headers.
 
 When a user agent receives an HTTP response containing a Critical-CH header, it
-first processes the Accept-CH header as described in Section 3.1 of
-{{RFC8942}}. It then performs the following steps:
+first processes the Accept-CH header as described in {{Section 3.1 of
+RFC8942}}. It then performs the following steps:
 
-1. If the request did not use a safe method (Section 4.2.1 of {{RFC7231}}), ignore the Critical-CH header and continue processing the response as usual.
+1. If the request did not use a safe method ({{Section 4.2.1 of RFC7231}}), ignore the Critical-CH header and continue processing the response as usual.
 
 2. If the response was already the result of a retry, ignore the Critical-CH header and continue processing the response as usual.
 
-3. Determine the Client Hints that would have been sent given the updated Accept-CH value, incorporating the user agent's local policy and user preferences. See also Section 2.1 of {{RFC8942}}.
+3. Determine the Client Hints that would have been sent given the updated Accept-CH value, incorporating the user agent's local policy and user preferences. See also {{Section 2.1 of RFC8942}}.
 
 4. Compare this result to the Client Hints which were sent. If any Client Hint listed in the Critical-CH header was not previously sent and would now have been sent, retry the request with the new preferences. Otherwise, continue processing the response as usual.
 
@@ -219,16 +219,16 @@ Origin-Len:
 : An unsigned, 16-bit integer indicating the length, in octets, of the Origin field.
 
 Origin:
-: A sequence of characters containing the ASCII serialization of an origin (Section 6.2 of {{RFC6454}}) that the sender is providing an Accept-CH value for.
+: A sequence of characters containing the ASCII serialization of an origin ({{Section 6.2 of RFC6454}}) that the sender is providing an Accept-CH value for.
 
 Value-Len:
 : An unsigned, 16-bit integer indicating the length, in octets, of the Value field.
 
 Value:
-: A sequence of characters containing the Accept-CH value for the corresponding origin. This value MUST satisfy the Accept-CH ABNF defined in Section 3.1 of {{RFC8942}}.
+: A sequence of characters containing the Accept-CH value for the corresponding origin. This value MUST satisfy the Accept-CH ABNF defined in {{Section 3.1 of RFC8942}}.
 
 Clients MUST NOT send ACCEPT_CH frames. Servers which receive an ACCEPT_CH
-frame MUST respond with a connection error (Section 5.4.1 of {{RFC7540}}) of type
+frame MUST respond with a connection error ({{Section 5.4.1 of RFC7540}}) of type
 PROTOCOL_ERROR.
 
 ACCEPT_CH frames always apply to a single connection, never a single stream. The
@@ -263,16 +263,16 @@ Origin Length:
 : A variable-length integer containing the length, in bytes, of the Origin field.
 
 Origin:
-: A sequence of characters containing the ASCII serialization of an origin (Section 6.2 of {{RFC6454}}) that the sender is providing an Accept-CH value for.
+: A sequence of characters containing the ASCII serialization of an origin ({{Section 6.2 of RFC6454}}) that the sender is providing an Accept-CH value for.
 
 Value Length:
 : A variable-length integer containing the length, in bytes, of the Value field.
 
 Value:
-: A sequence of characters containing the Accept-CH value for the corresponding origin. This value MUST satisfy the Accept-CH ABNF defined in Section 3.1 of {{RFC8942}}.
+: A sequence of characters containing the Accept-CH value for the corresponding origin. This value MUST satisfy the Accept-CH ABNF defined in {{Section 3.1 of RFC8942}}.
 
 Clients MUST NOT send ACCEPT_CH frames. Servers which receive an ACCEPT_CH
-frame MUST respond with a connection error (Section 8 of {{I-D.ietf-quic-http}})
+frame MUST respond with a connection error ({{Section 8 of I-D.ietf-quic-http}})
 of type H3_FRAME_UNEXPECTED.
 
 ACCEPT_CH frames may only be sent on the control stream. Clients which receive
@@ -290,13 +290,13 @@ resource usage.
 When the user agent makes an HTTP request to a particular origin over an HTTP/2
 or HTTP/3 connection, it looks up the origin in the remembered ACCEPT_CH, if
 any. If it finds a match, it determines additional Client Hints to send,
-incorporating its local policy and user preferences. See Section 2.1 of
-{{RFC8942}}.
+incorporating its local policy and user preferences. See {{Section 2.1 of
+RFC8942}}.
 
 If there are additional Client Hints, the user agent restarts the request with
 updated headers. The connection has already been established, so this restart
 does not incur any additional network latency. Note it may result in a different
-secondary HTTP cache key (see Section 4.1 of {{RFC7234}}) and select a different
+secondary HTTP cache key (see {{Section 4.1 of RFC7234}}) and select a different
 cached response. If the new cached response does not need revalidation, it may
 not use the connection at all.
 
@@ -331,8 +331,8 @@ be preferable. However, this is not always possible:
   Moreover, if the HTTP serving frontend is an intermediary like a CDN, it may
   not be proactively notified of origin server changes.
 
-* HTTP/2 and HTTP/3 allow connection reuse across multiple origins (Section
-  9.1.1 of {{RFC7540}} and Section 3.4 of {{I-D.ietf-quic-http}}). Some origins
+* HTTP/2 and HTTP/3 allow connection reuse across multiple origins ({{Section
+  9.1.1 of RFC7540}} and {{Section 3.4 of I-D.ietf-quic-http}}). Some origins
   may not be listed in the ACCEPT_CH frame, particularly if the server used a
   wildcard X.509 certificate.
 
@@ -344,7 +344,7 @@ Hint delivery, while the ACCEPT_CH frame avoids the retry in most cases.
 # Security Considerations
 
 Request header fields may expose sensitive information about the user's
-environment. Section 4.1 of {{RFC8942}} discusses some of these considerations.
+environment. {{Section 4.1 of RFC8942}} discusses some of these considerations.
 The document augments the capabilities of Client Hints, but does not change
 these considerations. The procedure described in {{critical-ch}} does not
 result in the user agent sending request headers it otherwise would not have.
@@ -352,8 +352,8 @@ result in the user agent sending request headers it otherwise would not have.
 The ACCEPT_CH frame does introduce a new way for HTTP/2 or HTTP/3 connections to
 make assertions about origins they are not authoritative for, but the procedure
 in  {{processing-accept-ch-frames}} defers processing until after the user agent
-has decided to use the connection for a particular request (Section 9.1.1 of
-{{RFC7540}} and Section 3.4 of {{I-D.ietf-quic-http}}). The user agent will thus
+has decided to use the connection for a particular request ({{Section 9.1.1 of
+RFC7540}} and {{Section 3.4 of I-D.ietf-quic-http}}). The user agent will thus
 only use information from an ACCEPT_CH frame if it considers the connection
 authoritative for the origin.
 
