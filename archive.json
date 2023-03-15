@@ -1,0 +1,211 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2021-02-14T00:18:01.973261+00:00",
+  "repo": "davidben/http-client-hint-reliability",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [
+    {
+      "number": 3,
+      "id": "MDU6SXNzdWU4MDQ4ODUyMDQ=",
+      "title": "Update references to client hints and structured headers",
+      "url": "https://github.com/davidben/http-client-hint-reliability/issues/3",
+      "state": "CLOSED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "davidben"
+      ],
+      "labels": [],
+      "body": "They are now RFC8941 and RFC8942. I've got a CL to do this, but xml2rfc.tools.ietf.org hasn't populated the XML files yet, so I'll upload it when it does.",
+      "createdAt": "2021-02-09T20:14:16Z",
+      "updatedAt": "2021-02-11T17:39:25Z",
+      "closedAt": "2021-02-11T17:39:25Z",
+      "comments": []
+    }
+  ],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "MDExOlB1bGxSZXF1ZXN0NTIzNTUyNDY2",
+      "title": "Also add an HTTP/3 frame.",
+      "url": "https://github.com/davidben/http-client-hint-reliability/pull/1",
+      "state": "MERGED",
+      "author": "davidben",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "@bencebeky",
+      "createdAt": "2020-11-18T22:51:28Z",
+      "updatedAt": "2020-11-19T18:48:17Z",
+      "baseRepository": "davidben/http-client-hint-reliability",
+      "baseRefName": "main",
+      "baseRefOid": "73be11c5b99a28247876cf8114ee7c51fdbc441b",
+      "headRepository": "davidben/http-client-hint-reliability",
+      "headRefName": "h3-frames",
+      "headRefOid": "30a7280c0575d63b68cf6c32a5bb5ef6afd86b90",
+      "closedAt": "2020-11-19T18:48:13Z",
+      "mergedAt": "2020-11-19T18:48:13Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "f59becbed7184f8baebf8eedc42b2394a5a0fbcf"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTMzOTYwNDE3",
+          "commit": {
+            "abbreviatedOid": "ffc1946"
+          },
+          "author": "bencebeky",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2020-11-18T23:19:56Z",
+          "updatedAt": "2020-11-18T23:21:11Z",
+          "comments": [
+            {
+              "originalPosition": 199,
+              "body": "s/nad/and/",
+              "createdAt": "2020-11-18T23:19:56Z",
+              "updatedAt": "2020-11-19T18:47:21Z"
+            },
+            {
+              "originalPosition": 201,
+              "body": "add one more space of indentation",
+              "createdAt": "2020-11-18T23:20:10Z",
+              "updatedAt": "2020-11-19T18:47:21Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTM0NzQ4MTY0",
+          "commit": {
+            "abbreviatedOid": "30a7280"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-11-19T18:47:37Z",
+          "updatedAt": "2020-11-19T18:47:37Z",
+          "comments": [
+            {
+              "originalPosition": 199,
+              "body": "Fixed.",
+              "createdAt": "2020-11-19T18:47:37Z",
+              "updatedAt": "2020-11-19T18:47:37Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTM0NzQ4MjU1",
+          "commit": {
+            "abbreviatedOid": "30a7280"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-11-19T18:47:44Z",
+          "updatedAt": "2020-11-19T18:47:45Z",
+          "comments": [
+            {
+              "originalPosition": 201,
+              "body": "Fixed.",
+              "createdAt": "2020-11-19T18:47:44Z",
+              "updatedAt": "2020-11-19T18:47:45Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "id": "MDExOlB1bGxSZXF1ZXN0NTY2OTU3NDEw",
+      "title": "Add missing word: _stream_ identifier.",
+      "url": "https://github.com/davidben/http-client-hint-reliability/pull/2",
+      "state": "MERGED",
+      "author": "bencebeky",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2021-02-03T16:15:00Z",
+      "updatedAt": "2021-02-04T01:11:00Z",
+      "baseRepository": "davidben/http-client-hint-reliability",
+      "baseRefName": "main",
+      "baseRefOid": "f59becbed7184f8baebf8eedc42b2394a5a0fbcf",
+      "headRepository": "bencebeky/http-client-hint-reliability",
+      "headRefName": "bencebeky-stream-identifier-typo",
+      "headRefOid": "b499ee5f34d2704a38f8ca8100dcd60186dc01d3",
+      "closedAt": "2021-02-04T01:11:00Z",
+      "mergedAt": "2021-02-04T01:11:00Z",
+      "mergedBy": "davidben",
+      "mergeCommit": {
+        "oid": "b0e1bb8b5507a287b445dbe3e3aa0e0e49abacad"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTgyOTU0MTk1",
+          "commit": {
+            "abbreviatedOid": "b499ee5"
+          },
+          "author": "davidben",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2021-02-04T01:10:54Z",
+          "updatedAt": "2021-02-04T01:10:54Z",
+          "comments": []
+        }
+      ]
+    }
+  ]
+}
