@@ -28,8 +28,8 @@ normative:
   RFC8941:
   RFC8942:
   RFC9000:
+  RFC9114:
 
-  I-D.ietf-quic-http:
   I-D.vvv-httpbis-alps:
   I-D.vvv-tls-alps:
 
@@ -70,7 +70,7 @@ mechanisms to resolve this:
    agent to retry the request
 
 2. an alternate delivery mechanism for Accept-CH in HTTP/2 {{RFC7540}} and
-   HTTP/3 {{I-D.ietf-quic-http}}, which can avoid the performance hit of a
+   HTTP/3 {{RFC9114}}, which can avoid the performance hit of a
    retry in most cases
 
 
@@ -272,7 +272,7 @@ Value:
 : A sequence of characters containing the Accept-CH value for the corresponding origin. This value MUST satisfy the Accept-CH ABNF defined in {{Section 3.1 of RFC8942}}.
 
 Clients MUST NOT send ACCEPT_CH frames. Servers which receive an ACCEPT_CH
-frame MUST respond with a connection error ({{Section 8 of I-D.ietf-quic-http}})
+frame MUST respond with a connection error ({{Section 8 of RFC9114}})
 of type H3_FRAME_UNEXPECTED.
 
 ACCEPT_CH frames may only be sent on the control stream. Clients which receive
@@ -332,7 +332,7 @@ be preferable. However, this is not always possible:
   not be proactively notified of origin server changes.
 
 * HTTP/2 and HTTP/3 allow connection reuse across multiple origins ({{Section
-  9.1.1 of RFC7540}} and {{Section 3.4 of I-D.ietf-quic-http}}). Some origins
+  9.1.1 of RFC7540}} and {{Section 3.3 of RFC9114}}). Some origins
   may not be listed in the ACCEPT_CH frame, particularly if the server used a
   wildcard X.509 certificate.
 
@@ -353,7 +353,7 @@ The ACCEPT_CH frame does introduce a new way for HTTP/2 or HTTP/3 connections to
 make assertions about origins they are not authoritative for, but the procedure
 in  {{processing-accept-ch-frames}} defers processing until after the user agent
 has decided to use the connection for a particular request ({{Section 9.1.1 of
-RFC7540}} and {{Section 3.4 of I-D.ietf-quic-http}}). The user agent will thus
+RFC7540}} and {{Section 3.3 of RFC9114}}). The user agent will thus
 only use information from an ACCEPT_CH frame if it considers the connection
 authoritative for the origin.
 
@@ -372,7 +372,7 @@ with the following parameters:
 * Reference: \[\[this document\]\]
 
 This specification adds an entry to the "HTTP/3 Frame Type" registry
-{{I-D.ietf-quic-http}} with the following parameters:
+{{RFC9114}} with the following parameters:
 
 * Frame Type: ACCEPT_CH
 
