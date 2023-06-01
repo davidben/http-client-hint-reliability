@@ -3,10 +3,10 @@
 
 
 HTTP                                                         D. Benjamin
-Internet-Draft                                                Google LLC
-Updates: ietf-httpbis-client-hints (if approved)           15 March 2023
-Intended status: Experimental                                           
-Expires: 16 September 2023
+Internet-Draft                                                    V. Tan
+Updates: ietf-httpbis-client-hints (if approved)              Google LLC
+Intended status: Experimental                                1 June 2023
+Expires: 3 December 2023
 
 
                         Client Hint Reliability
@@ -41,7 +41,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 September 2023.
+   This Internet-Draft will expire on 3 December 2023.
 
 Copyright Notice
 
@@ -74,7 +74,7 @@ Table of Contents
      7.1.  Normative References
      7.2.  Informative References
    Acknowledgments
-   Author's Address
+   Authors' Addresses
 
 1.  Introduction
 
@@ -520,8 +520,13 @@ Acknowledgments
    Ilya Grigorik, Nick Harper, Matt Menke, Aaron Tagliaboschi, Victor
    Vasiliev, Yoav Weiss, and others.
 
-Author's Address
+Authors' Addresses
 
    David Benjamin
    Google LLC
    Email: davidben@google.com
+
+
+   Victor Tan
+   Google LLC
+   Email: victortan@google.com
